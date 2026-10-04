@@ -107,7 +107,7 @@ toggle.name = "Switch to system preference"
 # plugin puts it in before the Markdown is rendered, so it lands in code blocks too. The key is not
 # extra.version: the theme reads that one as the switch for a version selector.
 [project.extra]
-ojf_version = "2.98.0.5"
+ojf_version = "2.98.0.6"
 # The Maven plugin is released from its own repository, openjavaformat/fmt-maven-plugin, with version
 # numbers of its own. Bump it on each release of the plugin.
 maven_plugin_version = "2.27.0.1"
