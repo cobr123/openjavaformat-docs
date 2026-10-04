@@ -1,0 +1,58 @@
+name: Follow open-java-format releases
+
+# The pages install the formatter version that zensical.toml names as ojf_version. Once an hour this
+# compares it with the latest release of openjavaformat/open-java-format. When a new release is out,
+# that line is changed, the result is pushed to main, and Documentation is run on it to deploy the
+# site. That run has to be explicit: a push made with the workflow's own token starts no
+# push-triggered workflow. Nothing but that line changes: the pages name earlier versions as
+# history, on Migrate for instance, and those stay as written.
+
+on:
+  schedule:
+    - cron: '17 * * * *' # not on the hour, when GitHub's schedule queue is longest
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  bump:
+    name: Bump to the latest release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push to main
+      actions: write # run Documentation
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Bump when a new release is out
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          current=$(sed -n 's/^ojf_version = "\(.*\)"$/\1/p' zensical.toml)
+          release=$(gh release view --repo openjavaformat/open-java-format --json tagName,publishedAt)
+          latest=$(jq -r .tagName <<< "$release")
+          published=$(jq -r '.publishedAt[:10]' <<< "$release")
+          if [ "$latest" = "$current" ]; then
+            echo "Already on $current."
+            exit 0
+          fi
+
+          # The dots are escaped so that sed takes them literally.
+          sed -i "s/^ojf_version = \"${current//./\\.}\"$/ojf_version = \"$latest\"/" zensical.toml
+          git diff
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit --all --quiet --file - <<COMMIT
+          Install open-java-format $latest
+
+          The pages install $latest, which openjavaformat/open-java-format
+          released on $published. Made by the "$GITHUB_WORKFLOW" workflow:
+          $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+          COMMIT
+          gh auth setup-git
+          git push origin HEAD:main
+          gh workflow run docs.yml --ref main

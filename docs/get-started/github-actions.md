@@ -29,7 +29,7 @@ the files that are not formatted and fails the job if there are any.
 
 | Input | Default | Meaning |
 | --- | --- | --- |
-| `version` | `2.98.0.5` | The formatter version to download |
+| `version` | `{{ ojf_version }}` | The formatter version to download |
 | `mode` | `changed` | `changed` checks the files of the pull request or push, `all` checks every `.java` file |
 
 A workflow that still pins 2.98.0.1 stays on `@v1`: that version needs the `--ojf` flag, which `@v2`
