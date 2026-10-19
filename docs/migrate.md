@@ -3,7 +3,8 @@
 ## From palantir-java-format
 
 open-java-format {{ ojf_version }} formats with the code of palantir-java-format 2.98.0, under new names
-and built in the open. The output is the same except for the fixes below. Anywhere else, switching
+and built in the open. The output is the same except for the fixes below, and any later change to
+it comes with a new minor version, see [Versions](about.md#versions). Anywhere else, switching
 produces no formatting diff and needs no reformatting commit.
 
 - Since 2.98.0.3 ([#32](https://github.com/openjavaformat/open-java-format/issues/32),
@@ -56,10 +57,7 @@ The Java packages are unchanged as well. Only the names in your build and your s
 | Command-line style flag | `--palantir` | none: there is one style |
 | Style in the API | `PALANTIR` | `OJF` |
 | IntelliJ plugin | `palantir-java-format` | `open-java-format` |
-| Java packages | `com.palantir.javaformat.*` | the same, for the whole 2.x line |
-
-The fourth number of the version counts builds of an upstream version: 2.98.0.1 was the first build
-of 2.98.0, and 2.98.0.2 is the second.
+| Java packages | `com.palantir.javaformat.*` | the same |
 
 ### Gradle
 

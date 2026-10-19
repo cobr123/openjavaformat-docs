@@ -35,8 +35,11 @@ jobs:
           release=$(gh release view --repo openjavaformat/open-java-format --json tagName,publishedAt)
           latest=$(jq -r .tagName <<< "$release")
           published=$(jq -r '.publishedAt[:10]' <<< "$release")
-          if [ "$latest" = "$current" ]; then
-            echo "Already on $current."
+          # The latest release is the one published last, and a fix for an older line can come out
+          # after a newer line started: only a higher version number is a bump.
+          newer=$(printf '%s\n' "$current" "$latest" | sort -V | tail -n 1)
+          if [ "$latest" = "$current" ] || [ "$newer" != "$latest" ]; then
+            echo "Already on $current; the latest release is $latest."
             exit 0
           fi
 

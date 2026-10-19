@@ -157,7 +157,8 @@ class Comments {
     }
     ```
 
-- **Layout changes of our own wait for 3.x.** For the whole 2.x line the output is the same as the
-  palantir-java-format release with the same version number, except where it fixes a bug, such as a
-  JBang script whose directives the formatter broke. [Migrate](migrate.md#from-palantir-java-format)
-  lists those fixes, and the [manifesto](manifesto.md) explains why output stability comes first.
+- **Layout changes of our own come with a new minor version.** The output is the same as
+  palantir-java-format 2.98.0's, except where it fixes a bug, such as a JBang script whose
+  directives the formatter broke. [Migrate](migrate.md#from-palantir-java-format) lists those
+  fixes, [Versions](about.md#versions) says which number moves for what, and the
+  [manifesto](manifesto.md) explains why output stability comes first.

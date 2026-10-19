@@ -19,6 +19,23 @@ The Maven Central artifacts, the Gradle plugins and the files of a GitHub releas
 from the tag of the version. The Maven plugin has a repository and a release workflow of its own,
 [openjavaformat/fmt-maven-plugin](https://github.com/openjavaformat/fmt-maven-plugin).
 
+## Versions
+
+A version is three numbers, `<java>.<minor>.<build>`, and each one answers a question of its own.
+
+- **The first is the Java version the formatter is built for**, 21 today. It moves when the minimum
+  Java version moves.
+- **The second counts changes to the output**: a fix in wrapping or alignment, a new
+  [library rule](library-rules/index.md), a new feature. A newer minor version can reformat code
+  that the previous one left alone, so take it with one reformatting run, in a commit of its own.
+- **The third counts builds that leave the output alone**: regressions, internal bugs, dependency
+  and build updates. A newer build formats every file exactly as the previous one did, so it is
+  safe to take at any time.
+
+Up to 2.98.0.6 the version was palantir-java-format's with a build number appended: 2.98.0.6 is the
+sixth build of 2.98.0. Once the bug fixes made the output differ from upstream, that numbering lost
+its meaning. [Migrate](migrate.md) lists those fixes.
+
 ## Verify a download
 
 Each file of a GitHub release has a `.asc` signature next to it, and so does each artifact on Maven
