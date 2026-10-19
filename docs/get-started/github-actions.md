@@ -4,6 +4,16 @@ Both checks run the native binary, so they need no Java, Maven or Gradle. They w
 glibc, on macOS and on Windows on x86-64. There is no native binary for musl-based Linux such as
 Alpine or for Windows on ARM.
 
+## Name the version
+
+Both checks take the formatter version from `.open-java-format-version` in the repository root, one
+of the [releases](https://github.com/openjavaformat/open-java-format/releases). There is one file
+for the two of them, so they cannot drift apart; without it, both stop and ask for it.
+
+``` text title=".open-java-format-version"
+{{ ojf_version }}
+```
+
 ## Check pull requests and pushes
 
 ``` yaml title=".github/workflows/format.yml"
@@ -18,9 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: openjavaformat/open-java-format-action@v2
+      - uses: openjavaformat/open-java-format-action@v4
         with:
-          version: '{{ ojf_version }}'
           mode: {% raw %}${{ github.event_name == 'push' && 'all' || 'changed' }}{% endraw %}
 ```
 
@@ -29,15 +38,45 @@ the files that are not formatted and fails the job if there are any.
 
 | Input | Default | Meaning |
 | --- | --- | --- |
-| `version` | `{{ ojf_version }}` | The formatter version to download |
 | `mode` | `changed` | `changed` checks the files of the pull request or push, `all` checks every `.java` file |
+| `code-scanning` | `false` | Also [report a newer release to code scanning](#see-when-a-newer-release-is-out) |
 
-A workflow that still pins 2.98.0.1 stays on `@v1`: that version needs the `--ojf` flag, which `@v2`
-does not pass.
+A workflow that still pins 2.98.0.1 stays on `@v1`: that version needs the `--ojf` flag, which later
+majors do not pass. `@v2` and `@v3` take the version as a `version` input instead of the file.
 
 On a pull request `changed` takes the file list from the pull request itself. On a push it compares
 the commits before and after, which needs that history in the checkout: either use `mode: all` for
 pushes, as above, or check out with `fetch-depth: 0`.
+
+## See when a newer release is out
+
+On every run the action compares the version in `.open-java-format-version` with the latest release
+and warns in the job log when a newer one is out. The warning can also become a code scanning alert,
+which shows under **Security → Code scanning** and in the checks of a pull request, points at
+`.open-java-format-version` and closes on its own once the version is updated. That takes
+`code-scanning: true` and the `security-events: write` permission, which the default token does not
+have. The `permissions` block replaces the job's default permissions, so it names everything else
+the job needs as well.
+
+``` yaml title=".github/workflows/format.yml"
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # the checkout
+      pull-requests: read # mode: changed reads the files of the pull request
+      security-events: write # the code scanning upload
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: openjavaformat/open-java-format-action@v4
+        with:
+          mode: {% raw %}${{ github.event_name == 'push' && 'all' || 'changed' }}{% endraw %}
+          code-scanning: true
+```
+
+Without the permission the upload is skipped with a line in the log and the job passes as before.
+Code scanning is free on public repositories; a private repository needs GitHub Code Security.
 
 ## Fix what the check found
 
@@ -68,7 +107,7 @@ The same check can stop a commit before it reaches CI. Copy the hook script from
 repository into your project:
 
 ``` sh
-curl -fsSL https://raw.githubusercontent.com/openjavaformat/open-java-format-action/v2/pre-commit -o .git/hooks/pre-commit
+curl -fsSL https://raw.githubusercontent.com/openjavaformat/open-java-format-action/v4/pre-commit -o .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 ```
 
@@ -80,10 +119,10 @@ To share the hook with the whole team, keep it in the repository instead:
 
 ``` sh
 mkdir -p .githooks
-curl -fsSL https://raw.githubusercontent.com/openjavaformat/open-java-format-action/v2/pre-commit -o .githooks/pre-commit
+curl -fsSL https://raw.githubusercontent.com/openjavaformat/open-java-format-action/v4/pre-commit -o .githooks/pre-commit
 chmod +x .githooks/pre-commit
 git config core.hooksPath .githooks
 ```
 
-The script pins its formatter version in `FORMATTER_VERSION` at the top. Keep it in step with the
-`version` your workflow passes to the action.
+The hook reads the same [`.open-java-format-version`](#name-the-version) as the action, and stops
+the commit with a message when the file is missing.

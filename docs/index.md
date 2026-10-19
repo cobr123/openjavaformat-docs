@@ -169,18 +169,21 @@ Downloads, checksums and every option are on the [Command line](get-started/comm
 
 ### In CI with GitHub Actions
 
+``` text title=".open-java-format-version"
+{{ ojf_version }}
+```
+
 ``` yaml title=".github/workflows/format.yml"
 - uses: actions/checkout@v7
 
-- uses: openjavaformat/open-java-format-action@v2
-  with:
-    version: '{{ ojf_version }}'
+- uses: openjavaformat/open-java-format-action@v4
 ```
 
 The [action](https://github.com/openjavaformat/open-java-format-action) downloads the native binary
-and fails the job when a changed file is not formatted. It needs no Java on the runner. The
+and fails the job when a changed file is not formatted. It needs no Java on the runner, and takes
+the formatter version from `.open-java-format-version` in the repository root. The
 [GitHub Action and pre-commit](get-started/github-actions.md) page has the full workflow and a git
-hook that runs the same check.
+hook that reads the same file and runs the same check.
 
 ## A drop-in for palantir-java-format
 
