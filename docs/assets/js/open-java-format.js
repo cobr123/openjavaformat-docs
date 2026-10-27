@@ -1426,7 +1426,7 @@ wasmImports.jsbody = {
 			return document.getElementById(id);
 		}catch( e ) {
 			conversion.handleJSError(e);}}).call(...args),
-	'_WebMain.highlightCode___V' : (...args) => (function(){
+	'_WebMain.highlightCodeImpl___V' : (...args) => (function(){
 		try{
 			highlightCode();
 		}catch( e ) {
