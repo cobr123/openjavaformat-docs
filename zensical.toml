@@ -35,6 +35,7 @@ nav = [
   ] },
   { "Migrate" = "migrate.md" },
   { "Manifesto" = "manifesto.md" },
+  { "Demo" = "demo.md" },
   { "About" = "about.md" },
 ]
 
